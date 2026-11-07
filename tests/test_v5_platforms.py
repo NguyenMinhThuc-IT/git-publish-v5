@@ -115,6 +115,7 @@ def run_installer(fixture, script="install.sh"):
 
 
 @pytest.mark.parametrize("platform", ["Linux", "Darwin"])
+@pytest.mark.skipif(sys.platform == "win32", reason="Requires POSIX launcher execution")
 def test_installer_launches_unicode_path_and_preserves_arguments(installer_fixture, platform):
     source, test_home, commands, env = installer_fixture
     (commands / "uname").write_text(f"#!/bin/sh\necho {platform}\n", encoding="utf-8")

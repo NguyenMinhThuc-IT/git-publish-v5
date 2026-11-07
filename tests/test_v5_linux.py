@@ -53,7 +53,10 @@ def test_matrix_stages_regression_suite_and_documentation(tmp_path):
     assert (tmp_path / "README.md").is_file()
 
 
-@pytest.mark.skipif(shutil.which("sh") is None, reason="POSIX shell (sh) unavailable")
+@pytest.mark.skipif(
+    sys.platform == "win32" or shutil.which("sh") is None,
+    reason="Requires non-Windows POSIX shell (sh) environment",
+)
 def test_container_script_is_valid_and_runs_headless_regressions():
     script = matrix.container_script("true")
     result = subprocess.run(["sh", "-n"], input=script, capture_output=True, text=True)

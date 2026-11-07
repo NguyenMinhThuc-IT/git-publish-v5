@@ -33,7 +33,10 @@ def run_installer(home: Path):
     )
 
 
-@pytest.mark.skipif(shutil.which("bash") is None, reason="Bash unavailable")
+@pytest.mark.skipif(
+    sys.platform == "win32" or shutil.which("bash") is None,
+    reason="Requires non-Windows Bash environment",
+)
 def test_installer_syntax():
     """Both installer scripts must have valid Bash syntax."""
     for script in (LINUX_INSTALLER, MAC_INSTALLER):
@@ -103,7 +106,10 @@ def test_existing_launcher_is_backed_up(tmp_path):
     )
 
 
-@pytest.mark.skipif(shutil.which("bash") is None, reason="Bash unavailable")
+@pytest.mark.skipif(
+    sys.platform == "win32" or shutil.which("bash") is None,
+    reason="Requires non-Windows Bash environment",
+)
 @pytest.mark.skipif(
     sys.platform == "darwin",
     reason="Only applicable to non-macOS systems",
