@@ -3,8 +3,28 @@
 CLI Python giúp chuẩn bị và đưa dự án lên GitHub qua Git và GitHub CLI.
 
 Đây là mã nguồn ứng viên phát hành đang được kiểm định, chưa phát hành công khai.
-PASS trên Ubuntu trong bộ test offline không xác nhận Windows/macOS hay mọi distro.
 Xem [báo cáo cuối](docs/V5_FINAL_REPORT.md) và [hỗ trợ hệ điều hành](docs/HO_TRO_HE_DIEU_HANH.md).
+
+## Trạng thái kiểm thử Git Publish V5.0.0
+
+Git Publish V5.0.0 đã vượt qua **10/10 job GitHub Actions**.
+
+| Nền tảng                  | Kết quả |
+| ------------------------- | ------- |
+| Ubuntu — Python 3.10–3.14 | PASS    |
+| Windows — Python 3.14     | PASS    |
+| macOS — Python 3.14       | PASS    |
+| Installer Ubuntu          | PASS    |
+| Installer Windows         | PASS    |
+| Installer macOS           | PASS    |
+
+**Ghi chú:**
+
+- Windows đã được kiểm thử publish thực tế.
+- macOS đã được kiểm thử trên GitHub Actions nhưng chưa xác minh trên máy Mac cá nhân.
+- Debian, Fedora, Arch và Kali chưa được kiểm thử riêng.
+
+[Xem kết quả CI](https://github.com/NguyenMinhThuc-IT/git-publish-v5/actions/runs/42355854261).
 
 ## Yêu cầu
 
@@ -26,7 +46,7 @@ bash installers/install.sh
 export PATH="$HOME/.local/bin:$PATH"
 ~~~
 
-macOS (chưa kiểm thử trên máy macOS thật):
+macOS (đã kiểm thử trên GitHub Actions, chưa xác minh trên máy Mac cá nhân):
 
 ~~~bash
 cd "/duong/dan/git-publish"
@@ -38,7 +58,7 @@ export PATH="$HOME/.local/bin:$PATH"
 ~/.bashrc với Bash tương tác hoặc ~/.zshrc với Zsh.
 Installer chỉ hướng dẫn, không sửa profile.
 
-Windows (CHƯA KIỂM THỬ TRÊN WINDOWS):
+Windows (đã kiểm thử trên GitHub Actions và publish thực tế):
 
 ~~~powershell
 cd "C:\duong dan\git-publish"
@@ -67,7 +87,7 @@ Private là mặc định; repo đã tồn tại giữ nguyên visibility.
 Origin khác đích, nhiều URL hoặc URL push khác fetch sẽ bị chặn.
 Không tự đổi origin, merge lịch sử phân nhánh hoặc force push.
 Chạy publish thực tế có thể tạo repo GitHub, commit và push sau các bước tương tác.
-Trong phiên phát triển V5 chỉ dùng Git local tạm và mock GitHub.
+Smoke test CI dùng thư mục tạm và entry point mẫu, không publish dự án thật.
 
 ## Bảo mật và giới hạn
 
