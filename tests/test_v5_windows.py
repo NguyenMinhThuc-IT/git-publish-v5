@@ -68,7 +68,7 @@ def test_windows_install_and_launch_in_temporary_directory(tmp_path, shell):
     assert not list(bindir.glob("*.tmp"))
     for launcher in (
         [executable, "-NoProfile", "-NonInteractive", "-File", str(bindir / "publish.ps1"), "space argument"],
-        ["cmd.exe", "/d", "/c", str(bindir / "publish.cmd"), "space argument"],
+        [str(bindir / "publish.cmd"), "space argument"],
     ):
         result = subprocess.run(launcher, capture_output=True, timeout=30)
         assert result.returncode == 7, result.stderr
