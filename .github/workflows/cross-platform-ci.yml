@@ -56,7 +56,7 @@ jobs:
         run: python -m pip install pytest
 
       - name: Run tests
-        run: python -m pytest -q --junitxml=pytest-report.xml
+        run: python -m pytest -q --ignore=tests/test_installer_smoke.py --junitxml=pytest-report.xml
 
       - name: Upload test report
         if: always()
@@ -64,5 +64,45 @@ jobs:
         with:
           name: pytest-${{ matrix.os }}-py${{ matrix.python }}
           path: pytest-report.xml
+          if-no-files-found: warn
+          retention-days: 7
+
+  installer-smoke:
+    name: Installer smoke / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    env:
+      GH_PROMPT_DISABLED: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+
+      - name: Install test dependencies
+        run: python -m pip install pytest
+
+      - name: Install and run native launchers in temporary directories
+        run: python -m pytest -q tests/test_installer_smoke.py --junitxml=installer-smoke-report.xml
+
+      - name: Upload smoke test report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: installer-smoke-${{ matrix.os }}
+          path: installer-smoke-report.xml
           if-no-files-found: warn
           retention-days: 7
