@@ -9,11 +9,11 @@ from src.gitpublish.config import APP_VERSION
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_public_docs_use_the_rc_version_and_do_not_claim_full_support():
-    for name in ("README.md", "docs/HUONG_DAN_SU_DUNG.md", "docs/HO_TRO_HE_DIEU_HANH.md",
-        "docs/V5_RELEASE_CHECKLIST.md"):
+def test_current_docs_use_current_version_and_keep_evidence_scoped():
+    for name in ("README.md", "docs/HUONG_DAN_SU_DUNG.md", "docs/HO_TRO_HE_DIEU_HANH.md"):
         text = (ROOT / name).read_text(encoding="utf-8")
         assert APP_VERSION in text, name
+    # Historical audit/checklist documents retain the version they actually audited.
     support = (ROOT / "docs/HO_TRO_HE_DIEU_HANH.md").read_text(encoding="utf-8")
     assert "CHƯA KIỂM THỬ TRÊN WINDOWS" in support
     assert "macOS/Bash 3.2 thật: NOT TESTED" in support

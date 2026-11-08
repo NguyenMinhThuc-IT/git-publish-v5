@@ -1,8 +1,10 @@
-# Hướng dẫn Git Publish V5 — 5.0.0rc1
+# Hướng dẫn Git Publish V5 — 5.0.1
 
 ## Chuẩn bị và cài đặt
 
-Python >=3.10, Git và GitHub CLI phải có sẵn trong PATH.
+Linux/macOS cần Python >=3.10, Git và GitHub CLI có sẵn.
+Windows: giải nén rồi chạy setup.cmd; xem [README](../README.md) về Python 3.11–3.15
+và cài dependency có xác nhận. Python 3.15 chưa công bố hỗ trợ.
 Không có thư viện Python bên thứ ba cho runtime.
 
 ~~~bash
@@ -18,7 +20,8 @@ Windows: dùng py -3 --version hoặc python --version.
 Xem [README](../README.md) để cài Linux/macOS/Windows.
 Quy trình thay phiên bản và khôi phục: [cập nhật/gỡ cài](V5_INSTALL_UPDATE_UNINSTALL.md).
 Giới hạn quét và đóng gói: [bảo mật](V5_SECURITY.md).
-Giữ thư mục nguồn ở nguyên vị trí. Nếu di chuyển hoặc thay Python, chạy lại installer.
+Linux/macOS hoặc installer trực tiếp: giữ thư mục nguồn ở nguyên vị trí.
+Windows setup.cmd sao chép mã vào LocalAppData; nếu thay Python, chạy lại setup.
 Launcher cũ được backup trước thay thế; có thể phục hồi thủ công sau khi kiểm tra.
 Linux/macOS không tự sửa PATH. Windows mặc định chỉ sửa User PATH.
 
@@ -49,10 +52,9 @@ Không xóa launcher backup trước khi xác minh bản mới.
 
 ### PowerShell chặn script
 
-Bộ cài và launcher không tự bypass execution policy. CMD launcher cũng gọi script
-PowerShell. Dùng quy trình cho phép script của tổ chức hoặc liên hệ quản trị viên;
-không cần cấp quyền quản trị cho thư mục cài mặc định.
-Windows thực tế vẫn CHƯA KIỂM THỬ TRÊN WINDOWS.
+Setup/launcher V5.0.1 dùng Bypass chỉ trong tiến trình PowerShell con, không sửa
+chính sách User/Machine. Group Policy vẫn có hiệu lực; nếu bị chặn, liên hệ quản trị viên.
+V5.0.0 đã kiểm thử Windows; setup V5.0.1 cần kết quả Windows mới.
 
 ### Origin khác đích hoặc URL push khác fetch
 

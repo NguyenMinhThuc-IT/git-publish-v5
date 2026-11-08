@@ -81,7 +81,7 @@ from src.gitpublish.cli import run
 from src.gitpublish.git import prepare_remote_for_push
 from src.gitpublish.security import scan_project
 
-assert APP_VERSION == "5.0.0rc1"
+assert APP_VERSION == "5.0.1"
 print(sys.version)
 print("Python imports: OK")
 CHECKPY
@@ -96,7 +96,7 @@ set +e
 launcher_status=$?
 set -e
 test "$launcher_status" -eq 1
-grep -q 'Git Publish v5.0.0rc1' /tmp/launcher-output
+grep -q 'Git Publish v5.0.1' /tmp/launcher-output
 grep -q 'gh auth login' /tmp/launcher-output
 
 git --version

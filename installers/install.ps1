@@ -1,11 +1,14 @@
 # Git Publish V5 - Windows installer
 # Requires Windows PowerShell 5.1 or newer.
-# No execution-policy changes are made by this installer or its launchers.
+# Launchers use a process-only policy flag; User/Machine policy is unchanged.
 
 [CmdletBinding()]
 param(
     [string]$BinDir = (Join-Path $HOME ".local\bin"),
-    [switch]$NoPathUpdate
+    [switch]$NoPathUpdate,
+    [string]$PythonPath = "",
+    [string]$GitPath = "",
+    [string]$GhPath = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -27,64 +30,19 @@ Write-Host "======================================"
 Write-Host " Git Publish V5 - Windows Installer"
 Write-Host "======================================"
 
-foreach ($tool in @("git", "gh")) {
-    $found = Get-Command `
-        -Name $tool `
-        -CommandType Application `
-        -ErrorAction SilentlyContinue
-
-    if (-not $found) {
-        throw "Thieu $tool. Hay cai dat truoc."
-    }
-
-    Write-Host "OK: $tool"
+. (Join-Path $PSScriptRoot "windows-common.ps1")
+$python = Get-GpPython -PreferredPath $PythonPath
+if (-not $python) { throw "Can Python 3.11-3.15. Chay setup.cmd de cai dependency voi xac nhan." }
+$PythonExe = $python.Path
+if (-not $python.Tested) { Write-Warning "Python $($python.Version): CHUA KIEM THU; 3.15 chua cong bo ho tro." }
+foreach ($toolName in @("git", "gh")) {
+    $selectedPath = if ($toolName -eq "git") { $GitPath } else { $GhPath }
+    if ($selectedPath) { $tool = Test-GpTool $toolName $selectedPath }
+    else { $tool = (Get-GpTool $toolName).Tool }
+    if (-not $tool) { throw "Can $toolName tuong thich. Chay setup.cmd." }
+    if ($toolName -eq "git") { $GitPath = $tool.Path } else { $GhPath = $tool.Path }
 }
-
-$PythonExe = $null
-$PrefixLiteral = "@()"
-
-foreach ($candidate in @("py", "python3", "python")) {
-    $command = Get-Command `
-        -Name $candidate `
-        -CommandType Application `
-        -ErrorAction SilentlyContinue |
-        Select-Object -First 1
-
-    if (-not $command) {
-        continue
-    }
-
-    $prefix = @()
-
-    if ($candidate -eq "py") {
-        $prefix = @("-3")
-    }
-
-    try {
-        & $command.Source @prefix -c `
-            "import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)" `
-            *> $null
-
-        if ($LASTEXITCODE -eq 0) {
-            $PythonExe = $command.Source
-
-            if ($candidate -eq "py") {
-                $PrefixLiteral = '@("-3")'
-            }
-
-            break
-        }
-    }
-    catch {
-        continue
-    }
-}
-
-if (-not $PythonExe) {
-    throw "Yeu cau Python 3.10 tro len."
-}
-
-Write-Host "OK: Python 3"
+Assert-GpPlainPath $BinDir
 
 $BinDir = [System.IO.Path]::GetFullPath($BinDir)
 if ($BinDir.Contains(";")) {
@@ -104,12 +62,13 @@ New-Item `
     Out-Null
 
 $CmdPath = Join-Path $BinDir "publish.cmd"
-$PsPath = Join-Path $BinDir "publish.ps1"
+$PsPath = Join-Path $BinDir "publish-runner.ps1"
+$LegacyPsPath = Join-Path $BinDir "publish.ps1"
 
 $Stamp = [Guid]::NewGuid().ToString("N")
 $Backups = @{}
 
-foreach ($target in @($CmdPath, $PsPath)) {
+foreach ($target in @($CmdPath, $PsPath, $LegacyPsPath)) {
     if (Test-Path -LiteralPath $target) {
         $item = Get-Item -LiteralPath $target -Force
         if ($item.PSIsContainer -or
@@ -130,26 +89,28 @@ foreach ($target in @($CmdPath, $PsPath)) {
 # Escape single quotes for PowerShell literals.
 $SafePython = $PythonExe.Replace("'", "''")
 $SafeEntry = $Entry.Replace("'", "''")
+$SafeGitDir = ([IO.Path]::GetDirectoryName($GitPath)).Replace("'", "''")
+$SafeGhDir = ([IO.Path]::GetDirectoryName($GhPath)).Replace("'", "''")
 
 $RunnerTemplate = @'
 $ErrorActionPreference = "Stop"
 $python = '{0}'
 $entry = '{1}'
-$prefix = {2}
+$env:Path = '{2};{3};' + $env:Path
 
-& $python @prefix -X utf8 $entry @args
+& $python -X utf8 $entry @args
 exit $LASTEXITCODE
 '@
 
 $Runner = $RunnerTemplate -f `
-    $SafePython, $SafeEntry, $PrefixLiteral
+    $SafePython, $SafeEntry, $SafeGitDir, $SafeGhDir
 
 $Utf8Bom = New-Object System.Text.UTF8Encoding($true)
 
 $Cmd = @'
 @echo off
 setlocal DisableDelayedExpansion
-powershell.exe -NoProfile -File "%~dp0publish.ps1" %*
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0publish-runner.ps1" %*
 exit /b %errorlevel%
 '@
 
@@ -180,6 +141,10 @@ try {
     $Installed += $PsPath
     Move-Item -LiteralPath $CmdTemporary -Destination $CmdPath -Force
     $Installed += $CmdPath
+    if ($Backups.ContainsKey($LegacyPsPath)) {
+        $Installed += $LegacyPsPath
+        Remove-Item -LiteralPath $LegacyPsPath -Force
+    }
 
 if (-not $NoPathUpdate -and -not $AlreadyInPath) {
     if ([string]::IsNullOrWhiteSpace($UserPath)) {
@@ -238,4 +203,4 @@ Write-Host ""
 Write-Host "Neu chua dang nhap GitHub:"
 Write-Host "    gh auth login"
 Write-Host ""
-Write-Host "V5 RC: CHUA KIEM THU TREN WINDOWS thuc te."
+Write-Host "Git Publish 5.0.1: hay xac minh CI Windows truoc phat hanh."

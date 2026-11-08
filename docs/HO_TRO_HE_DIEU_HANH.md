@@ -1,5 +1,16 @@
 # Git Publish V5 — bằng chứng tương thích
 
+## V5.0.1 — đang kiểm định
+
+Windows setup nhắm Python ổn định 3.11–3.15; 3.14 có bằng chứng Windows từ V5.0.0.
+3.11–3.13 và 3.15 chưa có kết quả Windows cho bản mới. 3.15 là thử nghiệm,
+chưa công bố hỗ trợ. CI giữ 10 cấu hình cũ và thêm Windows 3.11–3.13/3.15;
+lane 3.15 cho phép thất bại nếu runtime chưa thiết lập được, không được coi là PASS.
+Bộ cài dò từng interpreter và ghim executable tuyệt đối. Xem [README](../README.md).
+Linux/macOS installer không thay đổi. Các bảng phía dưới là bằng chứng audit lịch sử.
+
+## Audit lịch sử 5.0.0rc1
+
 Phiên kiểm tra 2026-11-07; phiên bản 5.0.0rc1.
 Audit2 tiếp tục xác nhận Ubuntu offline, không có môi trường native mới.
 PASS chỉ áp dụng phạm vi đã chạy. SKIPPED = có kiểm tra nhưng thiếu môi trường.

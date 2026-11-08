@@ -34,7 +34,7 @@ def setup_test_repo(tmp_path):
 def test_version():
     # V5 release candidate replaces the V4 runtime version.
     from src.gitpublish import __version__
-    assert APP_VERSION == __version__ == "5.0.0rc1"
+    assert APP_VERSION == __version__ == "5.0.1"
 
 
 def test_valid_repo_name():

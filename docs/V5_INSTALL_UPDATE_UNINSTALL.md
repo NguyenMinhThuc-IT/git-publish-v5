@@ -1,6 +1,6 @@
-# Cài đặt, cập nhật và gỡ Git Publish — 5.0.0rc1
+# Cài đặt, cập nhật và gỡ Git Publish — 5.0.1
 
-RC nội bộ, chưa phê duyệt phân phối công khai. Xem [hỗ trợ nền tảng](HO_TRO_HE_DIEU_HANH.md).
+V5.0.1 đang kiểm định; V5.0.0 đã phát hành. Xem [hỗ trợ nền tảng](HO_TRO_HE_DIEU_HANH.md).
 Các lệnh dưới đây là hướng dẫn để người dùng thực hiện, không phải thao tác đã chạy
 trên Windows/macOS trong phiên kiểm định.
 
@@ -31,7 +31,7 @@ Không cài dependency, không đăng nhập gh, không tạo repository GitHub.
 Cần Python >=3.10, Git, gh trong PATH; installer không cài những công cụ này.
 
 ~~~bash
-cd "/duong dan/git-publish-5.0.0rc1"
+cd "/duong dan/git-publish-5.0.1"
 bash installers/install.sh
 export PATH="$HOME/.local/bin:$PATH"
 ~~~
@@ -45,7 +45,7 @@ Cung cấp python3, Git, gh trước, có thể từ Homebrew do người dùng 
 Installer kiểm tra phiên bản Python và không tự cài Homebrew hoặc package.
 
 ~~~bash
-cd "/duong dan/git-publish-5.0.0rc1"
+cd "/duong dan/git-publish-5.0.1"
 bash installers/install-macos.sh
 export PATH="$HOME/.local/bin:$PATH"
 ~~~
@@ -53,37 +53,50 @@ export PATH="$HOME/.local/bin:$PATH"
 Với Zsh, lưu PATH vào ~/.zshrc. Script installer chạy bằng Bash, không chạy bằng
 source trong Zsh. pbcopy có kiểm thử mock; macOS/Bash 3.2 thật chưa xác minh.
 
-## Windows — CHƯA KIỂM THỬ TRÊN WINDOWS
+## Windows — one-click setup V5.0.1
 
-PowerShell 5.1 hoặc 7; Git, gh và Python >=3.10 có sẵn. Installer thử py -3,
-python3 rồi python; không tự thay execution policy.
+Giải nén ZIP rồi chạy setup.cmd. Setup kiểm tra Python ổn định 3.11–3.15, Git,
+gh và winget; mọi cài đặt/cập nhật đều cần xác nhận. Không tự đăng nhập GitHub.
+Python 3.15 vẫn thử nghiệm, chưa công bố hỗ trợ. Xem [README](../README.md)
+cho thứ tự chọn Python, nguồn tải chính thức và xử lý khi thiếu winget.
 
 ~~~powershell
-cd "C:\duong dan\git-publish-5.0.0rc1"
-.\installers\install.ps1
+cd "C:\duong dan\git-publish-5.0.1"
+.\setup.cmd
 ~~~
 
-CMD có thể gọi bộ cài bằng powershell.exe -NoProfile -File với đường dẫn được quote.
-Cần chính sách cho phép script. Mở terminal mới rồi dùng publish.cmd từ CMD hoặc
-PowerShell; publish.ps1 cũng có sẵn. CMD launcher vẫn chịu policy PowerShell.
+Mã nguồn được lưu tại %LOCALAPPDATA%\GitPublish\releases\5.0.1-<id>;
+mỗi lần cài tạo thư mục riêng, giữ mã nguồn/cấu hình cũ. Có thể xóa thư mục ZIP
+đã giải nén sau khi hoàn tất. install-state.json trong thư mục ứng dụng ghi
+Python tuyệt đối đã chọn; launcher sử dụng trực tiếp interpreter này.
+
+Mở terminal mới rồi dùng publish trong PowerShell hoặc CMD. publish.cmd gọi
+publish-runner.ps1 với policy Bypass chỉ trong tiến trình con, không thay
+execution policy User/Machine; Group Policy của tổ chức vẫn có hiệu lực.
+Bộ cài V5.0.1 cần xác minh Windows mới, tách biệt kết quả Windows V5.0.0.
 
 Cài vào thư mục riêng và không sửa User PATH:
 
 ~~~powershell
-.\installers\install.ps1 -BinDir "C:\Users\ten\Tools\GitPublish" -NoPathUpdate
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\installers\setup-windows.ps1 -BinDir "C:\Users\ten\Tools\GitPublish" -NoPathUpdate
 ~~~
+
+Installer trực tiếp installers/install.ps1 vẫn dành cho máy đã đủ dependency,
+nhận -PythonPath để chọn interpreter và tham chiếu thư mục nguồn tại chỗ.
 
 ## Cập nhật và khôi phục
 
 1. Kiểm tra ZIP mới và giải nén vào thư mục khác; giữ nguyên nguồn cũ.
-2. Chạy installer của bản mới. Launcher cũ được sao lưu trước thay thế.
+2. Chạy installer của bản mới (Windows: setup.cmd). Launcher cũ được sao lưu trước thay thế.
 3. Kiểm tra launcher/PATH và phiên bản trong header ở lần sử dụng tiếp theo.
    Không dùng dự án thật để thử push nếu chưa muốn publish.
 4. Nếu lỗi, dừng và phục hồi launcher từ backup hoặc chạy lại installer của nguồn cũ.
 5. Chỉ dọn nguồn/backup cũ sau khi xác minh launcher không còn trỏ tới chúng.
 
 Linux/macOS dùng launcher tại ~/.local/bin/publish; backup có dạng publish.backup.*.
-Windows có hai launcher và hai backup riêng: phải phục hồi cả publish.ps1/publish.cmd.
+Windows V5.0.1: phục hồi đồng bộ publish-runner.ps1/publish.cmd từ cùng lần backup.
+Khi quay về V5.0.0: khôi phục publish.ps1/publish.cmd cũ từ backup tương ứng;
+các thư mục releases cũ được giữ lại trong LocalAppData để phục hồi.
 Không chạy đồng thời hai installer. Không thay nội dung Git repository dự án khi cập nhật công cụ.
 
 ## Gỡ cài đặt mà giữ dữ liệu
@@ -100,7 +113,7 @@ mv -i "$HOME/.local/bin/publish" "$HOME/.local/bin/publish.disabled"
 Windows: vô hiệu hóa cả hai launcher; Rename-Item sẽ báo lỗi nếu tên mới đã tồn tại:
 
 ~~~powershell
-Rename-Item -LiteralPath (Join-Path $HOME ".local\bin\publish.ps1") -NewName "publish.ps1.disabled"
+Rename-Item -LiteralPath (Join-Path $HOME ".local\bin\publish-runner.ps1") -NewName "publish-runner.ps1.disabled"
 Rename-Item -LiteralPath (Join-Path $HOME ".local\bin\publish.cmd") -NewName "publish.cmd.disabled"
 ~~~
 

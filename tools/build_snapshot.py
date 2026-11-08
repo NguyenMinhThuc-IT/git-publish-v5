@@ -18,8 +18,8 @@ from src.gitpublish.config import APP_VERSION
 
 ARCHIVE_ROOT = f"git-publish-{APP_VERSION}"
 MANIFEST = "SOURCE_MANIFEST.json"
-ROOT_FILES = {"publish.py", "README.md", "CHANGELOG.md", "LICENSE", "requirements.txt", ".gitignore"}
-INSTALLERS = {"install.sh", "install-macos.sh", "install.ps1"}
+ROOT_FILES = {"publish.py", "README.md", "CHANGELOG.md", "LICENSE", "requirements.txt", ".gitignore", "setup.cmd"}
+INSTALLERS = {"install.sh", "install-macos.sh", "install.ps1", "windows-common.ps1", "setup-windows.ps1"}
 SKIP_DIRS = {
     ".git", "__pycache__", ".pytest_cache", ".venv", "venv", "env",
     "node_modules", ".mypy_cache", ".aws", ".ssh", ".gnupg", ".config",

@@ -18,7 +18,7 @@ def test_native_installer_and_launchers(tmp_path):
     source = tmp_path / "source with spaces tiếng Việt"
     installers = source / "installers"
     installers.mkdir(parents=True)
-    for name in ("install.sh", "install-macos.sh", "install.ps1"):
+    for name in ("install.sh", "install-macos.sh", "install.ps1", "windows-common.ps1"):
         shutil.copy2(ROOT / "installers" / name, installers / name)
 
     # Only this probe is executed by the real generated launchers.
@@ -52,12 +52,12 @@ def test_native_installer_and_launchers(tmp_path):
         shell = shutil.which("powershell")
         assert shell, "Windows PowerShell unavailable"
         command = [shell, "-NoProfile", "-NonInteractive", "-File",
-                   str(installers / "install.ps1"), "-BinDir", str(bindir), "-NoPathUpdate"]
+                   str(installers / "install.ps1"), "-BinDir", str(bindir), "-NoPathUpdate", "-PythonPath", sys.executable]
         launchers = [
-            [shell, "-NoProfile", "-NonInteractive", "-File", str(bindir / "publish.ps1")],
+            [shell, "-NoProfile", "-NonInteractive", "-File", str(bindir / "publish-runner.ps1")],
             [str(bindir / "publish.cmd")],
         ]
-        expected_files = [bindir / "publish.ps1", bindir / "publish.cmd"]
+        expected_files = [bindir / "publish-runner.ps1", bindir / "publish.cmd"]
     else:
         assert sys.platform in ("linux", "darwin"), "Requires Linux, macOS or Windows"
         shell = shutil.which("bash")

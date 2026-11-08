@@ -1,8 +1,9 @@
-# Git Publish V5 — 5.0.0rc1
+# Git Publish V5 — 5.0.1
 
 CLI Python giúp chuẩn bị và đưa dự án lên GitHub qua Git và GitHub CLI.
 
-Đây là mã nguồn ứng viên phát hành đang được kiểm định, chưa phát hành công khai.
+V5.0.1 bổ sung Windows one-click setup và lựa chọn Python động.
+V5.0.0 đã phát hành; V5.0.1 cần kiểm thử CI mới trước khi phát hành.
 Xem [báo cáo cuối](docs/V5_FINAL_REPORT.md) và [hỗ trợ hệ điều hành](docs/HO_TRO_HE_DIEU_HANH.md).
 
 ## Trạng thái kiểm thử Git Publish V5.0.0
@@ -28,15 +29,17 @@ Git Publish V5.0.0 đã vượt qua **10/10 job GitHub Actions**.
 
 ## Yêu cầu
 
-- Python 3.10 trở lên, Git và GitHub CLI (gh).
+- Linux/macOS: Python 3.10 trở lên. Windows setup: Python ổn định 3.11–3.15.
+- Git và GitHub CLI (gh); kiểm tra phiên bản và tính năng, không đặt giới hạn tối đa.
 - Khi sử dụng GitHub thật: đăng nhập trước bằng gh auth login.
 - Runtime Python chỉ dùng thư viện chuẩn; requirements.txt không có dependency.
-- Chạy test cần pytest đã cài. Installer không tự cài dependency hoặc đăng nhập.
+- Chạy test cần pytest đã cài. Windows setup chỉ cài/cập nhật dependency sau khi đồng ý.
+- Linux/macOS installer yêu cầu dependency có sẵn. Không bộ cài nào tự đăng nhập GitHub.
 
 ## Cài đặt
 
-Giải nén ZIP nguồn hoặc dùng bản nguồn đã được kiểm tra. Giữ nguyên thư mục nguồn
-sau khi cài: launcher tham chiếu trực tiếp tới publish.py.
+Giải nén ZIP nguồn hoặc dùng bản nguồn đã được kiểm tra. Trên Linux/macOS, giữ
+nguyên thư mục nguồn sau khi cài: launcher tham chiếu trực tiếp tới publish.py.
 
 Linux:
 
@@ -58,18 +61,60 @@ export PATH="$HOME/.local/bin:$PATH"
 ~/.bashrc với Bash tương tác hoặc ~/.zshrc với Zsh.
 Installer chỉ hướng dẫn, không sửa profile.
 
-Windows (đã kiểm thử trên GitHub Actions và publish thực tế):
+Windows — giải nén ZIP và nhấp đúp **setup.cmd** tại thư mục gốc:
 
 ~~~powershell
 cd "C:\duong dan\git-publish"
-.\installers\install.ps1
+.\setup.cmd
 ~~~
 
-Cần Windows PowerShell 5.1 hoặc PowerShell 7 và chính sách cho phép chạy script.
-Bộ cài tạo publish.ps1/publish.cmd trong $HOME\.local\bin, backup bản cũ
-và thêm User PATH. Mở terminal mới sau cài. Không tự đổi execution policy.
-Có thể dùng -BinDir với thư mục riêng và -NoPathUpdate để bỏ qua cập nhật PATH.
-Launcher CMD cũng gọi PowerShell, nên vẫn chịu chính sách script.
+Cần Windows PowerShell 5.1+ (có sẵn trên Windows 10/11). Setup sẽ:
+
+1. Dò Python qua launcher `py -0p`, registry PEP 514, PATH và các thư mục cài phổ biến;
+   chạy thử từng interpreter, loại bản lỗi, prerelease và bản ngoài mục tiêu 3.11–3.15.
+2. Ưu tiên Python 3.14 đã có bằng chứng CI Windows của V5.0.0, sau đó chọn bản ổn định
+   mới nhất trong mục tiêu. 3.11–3.13 và 3.15 được cảnh báo chưa kiểm thử Windows
+   cho bản mới; **3.15 là thử nghiệm, chưa công bố hỗ trợ** cho tới khi CI đầy đủ PASS.
+   Không sửa Python mặc định, không gỡ/hạ cấp phiên bản của dự án khác.
+3. Hiển thị Python, Git, gh và winget. Git cần >=2.23 và các probe branch/staging/pathspec;
+   gh cần các tính năng api --jq, repo create/view --json, auth status.
+   Phiên bản mới hơn không bị chặn nếu các probe đạt. Probe không kết nối GitHub.
+4. Nếu thiếu hoặc không tương thích, xin phép riêng từng thay đổi trước khi cài gói nào.
+   Dùng winget source `winget`, ID chính xác `Python.Python.3.14`, `Git.Git`, `GitHub.cli`.
+   Python được cài thêm phạm vi user với `--no-upgrade`; chỉ nâng Git/gh khi probe không đạt.
+   Gói có thể yêu cầu UAC/điều khoản nguồn. Từ chối/EOF sẽ dừng an toàn.
+5. Xác minh lại dependency, sao chép ứng dụng vào `%LOCALAPPDATA%\GitPublish\releases\5.0.1-<id>`
+   rồi gọi installer Windows hiện có. Mỗi lần cài giữ lại mã nguồn cũ và cấu hình;
+   không sao chép `.git`, credentials hay cache từ ZIP/thư mục nguồn.
+6. Tạo `publish.cmd` và `publish-runner.ps1` trong `$HOME\.local\bin`, backup launcher cũ,
+   cập nhật User PATH. `install-state.json` trong thư mục ứng dụng lưu đường dẫn Python
+   tuyệt đối đã xác minh; launcher ghim chính đường dẫn đó và thư mục Git/gh đã chọn.
+
+Mở terminal mới rồi chạy `publish` trong dự án. Có thể xóa thư mục ZIP đã giải nén sau
+khi setup hoàn tất. Không tự chạy `gh auth login`; đăng nhập thủ công khi cần dùng thật.
+Cài lại bằng `setup.cmd` để chọn lại Python nếu interpreter đã bị di chuyển/gỡ.
+Các bản ứng dụng cũ được giữ lại; không tự xóa để tránh mất dữ liệu tùy chỉnh.
+
+Thiếu winget: cài/cập nhật **App Installer** từ [Microsoft Store](https://aka.ms/getwinget)
+hoặc theo [hướng dẫn Microsoft](https://learn.microsoft.com/windows/package-manager/winget/).
+Không tải bộ cài từ nguồn ngẫu nhiên. Có thể cài thủ công từ
+[Python](https://www.python.org/downloads/windows/), [Git](https://git-scm.com/downloads/win),
+[GitHub CLI](https://cli.github.com/) rồi chạy lại setup. Lỗi mạng/winget hoặc xác minh
+không đạt sẽ dừng; kiểm tra lỗi rồi chạy lại, không tự gỡ/hạ cấp dependency.
+
+Setup và launcher dùng `-ExecutionPolicy Bypass` chỉ cho tiến trình PowerShell con;
+không sửa execution policy User/Machine. Chính sách Group Policy của tổ chức vẫn có
+hiệu lực; nếu bị chặn, liên hệ quản trị viên. Bộ cài trực tiếp dành cho máy đã đủ dependency:
+
+~~~powershell
+.\installers\install.ps1 -PythonPath "C:\Python314\python.exe"
+~~~
+
+Bộ cài trực tiếp tham chiếu thư mục nguồn hiện tại. Có thể dùng `-BinDir` và
+`-NoPathUpdate`. Setup PowerShell cũng nhận hai tùy chọn này và `-InstallRoot`.
+Launcher `publish.ps1` cũ được backup và thay bằng tên nội bộ `publish-runner.ps1`
+để lệnh `publish` trong PowerShell gọi được `publish.cmd`.
+V5.0.1 cần xác minh Windows CI và máy Windows thật; kết quả 10/10 ở trên thuộc V5.0.0.
 
 ## Sử dụng
 
@@ -150,4 +195,4 @@ Audit mẫu credentials không thay thế review nội dung toàn diện. Kiểm
 ghi theo PASS/FAIL/SKIPPED/NOT TESTED; thiếu runtime không được coi là PASS.
 
 LICENSE hiện trống. Chủ dự án cần quyết định giấy phép trước phát hành.
-Remote origin của workspace hiện không phải đích phát hành Git Publish.
+Không tạo tag/Release V5.0.1 trước khi có kết quả kiểm thử và phê duyệt phát hành.

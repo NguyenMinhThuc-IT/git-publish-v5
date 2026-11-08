@@ -1,5 +1,24 @@
 # Changelog
 
+## 5.0.1 — Unreleased
+
+- Windows: thêm setup.cmd, kiểm tra dependency và xin phép trước khi cài/nâng cấp qua winget.
+- Dò nhiều Python qua py/registry/PATH, chạy probe, chọn và ghim executable tuyệt đối.
+  Mục tiêu bản ổn định 3.11–3.15; ưu tiên 3.14 có bằng chứng Windows V5.0.0.
+  Python 3.15 vẫn thử nghiệm, chưa công bố hỗ trợ khi chưa có CI PASS.
+- Kiểm tra Git/gh bằng phiên bản và tính năng offline; không đặt trần phiên bản,
+  không nâng cấp công cụ đang tương thích, không hạ cấp/gỡ hay tự đăng nhập GitHub.
+- Cài mã nguồn vào LocalAppData, giữ các bản cũ/cấu hình, backup và rollback launcher.
+  publish.cmd gọi script nội bộ với execution policy chỉ trong tiến trình con.
+- Thêm test PowerShell mock dependency/winget, lỗi/từ chối/cài lại/Unicode/interpreter;
+  mở rộng CI Windows 3.11–3.13 và lane thử nghiệm 3.15, giữ 10 cấu hình CI cũ.
+- Giữ nguyên luồng publish, bảo vệ file nhạy cảm, Git history và xác nhận V5.
+
+## 5.0.0 — Released
+
+Theo kết quả đã công bố: 10/10 GitHub Actions jobs PASS; Windows đã publish thực tế.
+Các ghi chú 5.0.0rc1 dưới đây là lịch sử audit trước phát hành.
+
 ## 5.0.0rc1 — Unreleased, audit bổ sung 2026-11-07
 
 Không có tag hoặc GitHub Release. Đây là mã ứng viên tiếp tục QA.

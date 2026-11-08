@@ -1,7 +1,7 @@
 """Application configuration."""
 
 APP_NAME = "Git Publish"
-APP_VERSION = "5.0.0rc1"
+APP_VERSION = "5.0.1"
 
 DEFAULT_BRANCH = "main"
 COMMAND_TIMEOUT = 60

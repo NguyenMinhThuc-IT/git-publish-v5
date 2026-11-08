@@ -96,7 +96,8 @@ def test_actual_source_roundtrip_has_matching_manifest(tmp_path):
     for name, expected in manifest.items():
         assert packaging.sha256((extracted / name).read_bytes()).hexdigest() == expected
     assert not (extracted / ".git").exists()
-    assert (extracted / "installers/install.ps1").is_file()
+    for name in ("setup.cmd", "installers/install.ps1", "installers/windows-common.ps1", "installers/setup-windows.ps1"):
+        assert (extracted / name).is_file()
 
 
 @pytest.mark.parametrize("content", [
